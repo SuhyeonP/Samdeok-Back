@@ -6,7 +6,6 @@ const typeDefs=`
         _id:ID!
         name:String!
         snsId:String!
-        gender:String!
         birth:String!
         age:Int!
     }
@@ -37,8 +36,9 @@ const typeDefs=`
     type Query{
         allUsers:[Users]
         getUser(_id:ID!):Users
+        loginUser(snsId:String!,name:String!):Users
         allStores:[Shops]
-        getStore(_id:ID!):Shops
+        getStore(storeId:ID!):Shops
         getStoreMaster(masterId:ID!):Shops
         allReviews:[Reviews]
         getStoreReviews(inShop:ID):Reviews
@@ -58,7 +58,6 @@ const typeDefs=`
     input userInput{
         name:String!
         snsId:String!
-        gender:String!
         birth:String!
         age:Int!
     }

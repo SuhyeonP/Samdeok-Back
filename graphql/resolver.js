@@ -11,11 +11,14 @@ const resolvers={
         async getUser(root,{_id}){
             return await Users.findById(_id);
         },
+        async loginUser(root,{snsId,name}){
+            return await Users.findOne({snsId:snsId,name:name});
+        },
         async allStores(){
             return await Shops.find();
         },
-        async getStore(root,{_id}){
-            return await Shops.findById(_id);
+        async getStore(root,{storeId}){
+            return await Shops.findById(storeId);
         },
         async getStoreMaster(root,{masterId}){
             return await Shops.findOne({masterId:masterId})
