@@ -22,6 +22,14 @@ const ShopSchema=new Schema({
         type:ObjectId,
         required:true,
         ref:'Users'
+    },
+    openTime:{
+        type:Number,
+        required:true
+    },
+    closeTime:{
+        type:Number,
+        required:true
     }
 })
 

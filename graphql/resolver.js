@@ -88,17 +88,17 @@ const resolvers={
             return await Reviews.findOneAndDelete({ _id });
         },
         async createReservation(root,{input}){
-            return await Reviews.create(input)
+            return await Reservations.create(input)
         },
         async updateReservation(root,{_id,input}){
-            return await Reviews.findOneAndUpdate(
+            return await Reservations.findOneAndUpdate(
                 { _id },
                 input,
                 { new: true }
             );
         },
         async deleteReservation(root, { _id }) {
-            return await Reviews.findOneAndDelete({ _id });
+            return await Reservations.findOneAndDelete({ _id });
         }
     }
 }

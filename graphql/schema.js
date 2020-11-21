@@ -16,6 +16,8 @@ const typeDefs=`
         address:String
         part:String
         masterId:ID!
+        openTime:Int
+        closeTime:Int
     }
     type Reviews{
         _id:ID!
@@ -54,6 +56,8 @@ const typeDefs=`
         address:String!
         part:String!
         masterId:ID!
+        openTime:Int!
+        closeTime:Int!
     }
     input userInput{
         name:String!
