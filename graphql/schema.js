@@ -48,7 +48,7 @@ const typeDefs=`
         allReservation:[Reservations]
         getUserReservation(checkUser:ID):Reservations
         getShopReservation(checkShop:ID):Reservations
-        
+        dupCheckReservation(checkShop:ID!,time:String!):Reservations
     }
     input shopInput{
         shopName:String!
@@ -91,6 +91,10 @@ const typeDefs=`
         createReservation(input:checkReservation):Reservations
         updateReservation(_id:ID!,input:checkReservation):Reservations
         deleteReservation(_id:ID!):Reservations
+    }
+    
+    type Subscription{
+        newReservation:Reservations
     }
 `;
 

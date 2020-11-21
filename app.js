@@ -7,13 +7,17 @@ const app=express();
 const dotenv=require('dotenv')
 const path=require('path')
 const graphqlHTTP=require('express-graphql').graphqlHTTP;
-
+const bodyParser=require('body-parser')
+const http=require('http')
+const {SubscriptionServer}=require('subscriptions-transport-ws')
+const {PubSub}=require('graphql-subscriptions')
+const {ApolloServer}=require('apollo-server-express')
 
 dotenv.config()
 
 app.use(morgan('dev'));
 app.use('/', express.static(path.join(__dirname, 'uploads')));
-app.use(express.json())
+app.use('/graphql', bodyParser.json());
 app.use(express.urlencoded({extended:false}))
 const MPW=process.env.DB_PASSWORD
 const dbAddress = `mongodb+srv://graphqlfirst:${MPW}@cluster0.kc7jm.mongodb.net/Reservation?retryWrites=true&w=majority`;

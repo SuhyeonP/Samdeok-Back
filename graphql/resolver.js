@@ -43,6 +43,9 @@ const resolvers={
         async getShopReservation(_,{checkShop}){
             return await Reservations.find({checkShop:checkShop}).filter((element)=>element.checkShop===checkShop)
         },
+        async dupCheckReservation(root,{checkShop,time}){
+            return await Reservations.findOne({checkShop:checkShop,time:time})
+        }
 
     },
     Mutation:{
@@ -99,6 +102,11 @@ const resolvers={
         },
         async deleteReservation(root, { _id }) {
             return await Reservations.findOneAndDelete({ _id });
+        }
+    },
+    Subscription:{
+        newReservation:{
+            subscribe:({pubsub})=>pubsub.asyncIterator("createReservation")
         }
     }
 }
