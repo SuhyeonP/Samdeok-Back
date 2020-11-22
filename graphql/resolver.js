@@ -2,113 +2,24 @@ const Users=require('../schemas/user')
 const Shops=require('../schemas/shop')
 const Reviews=require('../schemas/review')
 const Reservations=require('../schemas/reservation')
+const {PubSub}=require('graphql-subscriptions')
+const pubsub = new PubSub();
 
 const resolvers={
     Query:{
-        async allUsers(){
-            return await Users.find();
-        },
-        async getUser(root,{_id}){
-            return await Users.findById(_id);
-        },
-        async loginUser(root,{snsId,name}){
-            return await Users.findOne({snsId:snsId,name:name});
-        },
-        async allStores(){
-            return await Shops.find();
-        },
-        async getStore(root,{storeId}){
-            return await Shops.findById(storeId);
-        },
-        async getStoreMaster(root,{masterId}){
-            return await Shops.findOne({masterId:masterId})
-        },
-        async allReviews(){
-            return await Reviews.find()
-        },
-        async getStoreReviews(inShop){
-            const data=await Reviews.find().filter((element)=>element.inShop===String(inShop));
-            return data;
-        },
-        async getUserReviews(writtenBy){
-            const data=await Reviews.find().filter((element)=>element.writtenBy===String(writtenBy));
-            return data;
-        },
-        async allReservation(){
-            return await Reservations.find()
-        },
-        async getUserReservation(_,{checkUser}){
-            return await Reservations.find({checkUser:checkUser}).filter((element)=>element.checkUser===checkUser)
-        },
-        async getShopReservation(_,{checkShop}){
-            return await Reservations.find({checkShop:checkShop}).filter((element)=>element.checkShop===checkShop)
-        },
-        async dupCheckReservation(root,{checkShop,time}){
-            return await Reservations.findOne({checkShop:checkShop,time:time})
+        allReservation:()=>{
+            return Reservations.find();
         }
-
     },
     Mutation:{
-        async createUser(root,{input}){
-            return await Users.create(input)
-        },
-        async updateUser(root,{_id,input}){
-            return await Users.findOneAndUpdate(
-                { _id },
-                input,
-                { new: true }
-            );
-        },
-        async deleteUser(root, { _id }) {
-            return await Users.findOneAndDelete({ _id });
-        },
-
-        async createShop(root,{input}){
-            return await Shops.create(input)
-        },
-        async updateShop(root,{_id,input}){
-            return await Shops.findOneAndUpdate(
-                { _id },
-                input,
-                { new: true }
-            );
-        },
-        async deleteShop(root, { _id }) {
-            return await Shops.findOneAndDelete({ _id });
-        },
-
-        async createReview(root,{input}){
-            return await Reviews.create(input)
-        },
-        async updateReview(root,{_id,input}){
-            return await Reviews.findOneAndUpdate(
-                { _id },
-                input,
-                { new: true }
-            );
-        },
-        async deleteReview(root, { _id }) {
-            return await Reviews.findOneAndDelete({ _id });
-        },
-        async createReservation(root,{input}){
-            return await Reservations.create(input)
-        },
-        async updateReservation(root,{_id,input}){
-            return await Reservations.findOneAndUpdate(
-                { _id },
-                input,
-                { new: true }
-            );
-        },
-        async deleteReservation(root, { _id }) {
-            return await Reservations.findOneAndDelete({ _id });
+        checkInShop:(_,{checkShop,checkUser,time})=>{
+            Reservations.create({checkShop,checkUser,time});
+            return "Success"
         }
     },
-    Subscription:{
-        newReservation:{
-            subscribe:({pubsub})=>pubsub.asyncIterator("createReservation")
-        }
-    }
+    // Subscription:{
+    //
+    // }
 }
 
 module.exports = {resolvers}
