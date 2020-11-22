@@ -3,10 +3,9 @@ const express=require('express');
 const morgan = require('morgan');
 const cors=require('cors')
 const mongoose=require('mongoose')
-const app=express();
 const dotenv=require('dotenv')
 const path=require('path')
-const graphqlHTTP=require('express-graphql').graphqlHTTP;
+const http=require('http')
 const bodyParser=require('body-parser')
 const {createServer}=require('http')
 const {SubscriptionServer}=require('subscriptions-transport-ws')
@@ -15,11 +14,9 @@ const {ApolloServer}=require('apollo-server-express')
 const {execute,subscribe} =require('graphql')
 
 dotenv.config()
-
+const PORT=3050
+const app=express();
 app.use(morgan('dev'));
-app.use('/', express.static(path.join(__dirname, 'uploads')));
-app.use('/graphql', bodyParser.json());
-app.use(express.urlencoded({extended:false}))
 const MPW=process.env.DB_PASSWORD
 const dbAddress = `mongodb+srv://graphqlfirst:${MPW}@cluster0.kc7jm.mongodb.net/Reservation?retryWrites=true&w=majority`;
 mongoose
@@ -31,14 +28,6 @@ mongoose
     })
     .then(() => console.log("mongodb 연결성공"))
     .catch((err) => console.log(err));
-
-
-const apolloServer=new ApolloServer({schema:schema})
-apolloServer.applyMiddleware({app})
-
-const pubsub=new PubSub();
-const server=createServer(app);
-
 if(process.env.NODE_ENV==='production'){
     app.use(cors({
         origin: ['http://localhost:3000'],
@@ -52,9 +41,22 @@ if(process.env.NODE_ENV==='production'){
     }))
 }
 
-app.get('/',(req,res,next)=>{
-    res.send('hi this is graphql BackServer')
+const server=new ApolloServer({
+    schema
 })
+server.applyMiddleware({app})
+
+const httpServer=http.createServer(app)
+server.installSubscriptionHandlers(httpServer)
+
+httpServer.listen(PORT,()=>{
+    console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+    console.log(`Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
+})
+
+// app.get('/',(req,res,next)=>{
+//     res.send('hi this is graphql BackServer')
+// })
 
 // app.use('/graphql',graphqlHTTP({
 //     schema:schema,
@@ -65,14 +67,14 @@ app.get('/',(req,res,next)=>{
 //     console.log('service start')
 // })
 
-server.listen(3050,()=>{
-    new SubscriptionServer({
-        execute,
-        subscribe,
-        schema:schema,
-    },{
-        server:server,
-        path:'/subscriptions'
-    })
-})
+// server.listen(3050,()=>{
+//     new SubscriptionServer({
+//         execute,
+//         subscribe,
+//         schema:schema,
+//     },{
+//         server:server,
+//         path:'/subscriptions'
+//     })
+// })
 

@@ -1,5 +1,7 @@
 const {makeExecutableSchema}=require('graphql-tools')
 const {resolvers}=require('./resolver')
+const {PubSub}=require('graphql-subscriptions')
+const pubsub = new PubSub();
 
 const typeDefs=`
     type Users{
@@ -33,44 +35,21 @@ const typeDefs=`
         checkShop:ID
         checkUser:ID
     }
-    
-    input shopInput{
-        shopName:String!
-        shopSns:String
-        address:String!
-        part:String!
-        masterId:ID!
-        openTime:Int!
-        closeTime:Int!
-    }
-    input userInput{
-        name:String!
-        snsId:String!
-        birth:String!
-        age:Int!
-    }
-    input userReview{
-        title:String!
-        content:String!
-        rating:Int
-        inShop:ID!
-        writtenBy:ID!
-    }
-    input checkReservation{
-        time:String!
-        checkShop:ID!
-        checkUser:ID!
-    }
+   
     type Query{
        allReservation:[Reservations]
     }
     type Mutation{
-       checkInShop(checkShop:ID!,checkUser:ID!,time:String!):String!
+       checkInShop(checkShop:ID!,checkUser:ID!,time:String!):Reservations
+    }
+    type Subscription{
+        newReservation:Reservations
     }
 `;
 
 const schema=makeExecutableSchema({
     typeDefs,
-    resolvers
+    resolvers,
+    //context:{pubsub}
 })
 module.exports=schema;
