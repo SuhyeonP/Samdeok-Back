@@ -8,10 +8,11 @@ const dotenv=require('dotenv')
 const path=require('path')
 const graphqlHTTP=require('express-graphql').graphqlHTTP;
 const bodyParser=require('body-parser')
-const http=require('http')
+const {createServer}=require('http')
 const {SubscriptionServer}=require('subscriptions-transport-ws')
 const {PubSub}=require('graphql-subscriptions')
 const {ApolloServer}=require('apollo-server-express')
+const {execute,subscribe} =require('graphql')
 
 dotenv.config()
 
@@ -32,6 +33,11 @@ mongoose
     .catch((err) => console.log(err));
 
 
+const apolloServer=new ApolloServer({schema:schema})
+apolloServer.applyMiddleware({app})
+
+const pubsub=new PubSub();
+const server=createServer(app);
 
 if(process.env.NODE_ENV==='production'){
     app.use(cors({
@@ -50,11 +56,23 @@ app.get('/',(req,res,next)=>{
     res.send('hi this is graphql BackServer')
 })
 
-app.use('/graphql',graphqlHTTP({
-    schema:schema,
-    graphiql:true
-}))
+// app.use('/graphql',graphqlHTTP({
+//     schema:schema,
+//     graphiql:true
+// }))
+//
+// app.listen(3050,()=>{
+//     console.log('service start')
+// })
 
-app.listen(3050,()=>{
-    console.log('service start')
+server.listen(3050,()=>{
+    new SubscriptionServer({
+        execute,
+        subscribe,
+        schema:schema,
+    },{
+        server:server,
+        path:'/subscriptions'
+    })
 })
+
